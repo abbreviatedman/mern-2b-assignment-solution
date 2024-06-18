@@ -71,9 +71,31 @@ app.post("/:type", (req, res) => {
   res.status(200).json({ message: "success", payload: name });
 });
 
-app.all('*', (_, res) => {
-  res.status(404).json({message: 'failure', payload: 'Resource not found.'})
-})
+app.put("/:type", (req, res) => {
+  const { newIngredient } = req.body;
+  const types = Object.keys(ingredients);
+  if (!newIngredient) {
+    res.status(400).json({
+      message: "failure",
+      payload: "New ingredients must be included in the request body.",
+    });
+
+    return;
+  }
+
+  if (!ingredients.includes(type)) {
+    res.status(500).json({
+      message: "failure",
+      payload: "No ingredients with that type exist.",
+    });
+
+    return;
+  }
+});
+
+app.all("*", (_, res) => {
+  res.status(404).json({ message: "failure", payload: "Resource not found." });
+});
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
