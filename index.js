@@ -72,9 +72,10 @@ app.post("/:type", (req, res) => {
 });
 
 app.put("/:type", (req, res) => {
-  const { newIngredient } = req.body;
+  const { newIngredients } = req.body;
+  const { type } = req.params;
   const types = Object.keys(ingredients);
-  if (!newIngredient) {
+  if (!newIngredients) {
     res.status(400).json({
       message: "failure",
       payload: "New ingredients must be included in the request body.",
@@ -83,7 +84,7 @@ app.put("/:type", (req, res) => {
     return;
   }
 
-  if (!ingredients.includes(type)) {
+  if (!types.includes(type)) {
     res.status(500).json({
       message: "failure",
       payload: "No ingredients with that type exist.",
@@ -91,6 +92,28 @@ app.put("/:type", (req, res) => {
 
     return;
   }
+
+  ingredients[type] = newIngredients;
+  res.status(200).json({ message: "success", payload: newIngredients });
+});
+
+app.delete("/:ingredient", (req, res) => {
+  const { ingredient } = req.params;
+  const types = Object.keys(ingredients);
+  for (let i = 0; i < types.length; i++) {
+    const ingredientsForCurrentType = ingredients[types[i]];
+    const j = ingredientsForCurrentType.indexOf(ingredient);
+    if (j !== -1) {
+      ingredientsForCurrentType.splice(j, 1);
+      res.status(200).json({ message: "success", payload: ingredient });
+
+      return;
+    }
+  }
+
+  res
+    .status(500)
+    .json({ message: "failure", payload: "No ingredient by that name found." });
 });
 
 app.all("*", (_, res) => {
